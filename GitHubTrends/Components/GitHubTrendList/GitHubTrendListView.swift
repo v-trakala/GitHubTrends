@@ -9,7 +9,8 @@ import SwiftUI
 
 struct GitHubTrendListView: View {
     @State private var isDarkMode: Bool = false
-    
+    @State private var shownCards: [Bool] = []
+
     @State var viewModel: GitHubTrendListViewModelProtocol
     
     var body: some View {
@@ -49,19 +50,33 @@ struct GitHubTrendListView: View {
     }
     
     var trends: some View {
-        ZStack {
-            ScrollView {
-                VStack(spacing: 20) {
-                    ForEach(viewModel.repostiories, id: \.id) { repository in
+        ScrollView {
+            Rectangle()
+                .frame(maxWidth: .infinity)
+                .frame(height: 0)
+            
+            VStack(spacing: 20) {
+                ForEach(Array(viewModel.repostiories.enumerated()), id: \.element) { index, repository in
+                    if shownCards.indices.contains(index) && shownCards[index] {
                         NavigationLink(value: repository) {
-                            GitHubCard(repository: repository)
+                            GitHubCard(repository: repository, index: index)
                         }
+                        .padding(.horizontal)
+                        .transition(.move(edge: .trailing))
+                        .animation(.spring(duration: 0.5).delay(Double(index) * 0.1))
                     }
                 }
-                .padding(.horizontal)
             }
         }
-        
+        .onAppear {
+            shownCards = Array(repeating: false, count: viewModel.repostiories.count)
+            
+            for index in viewModel.repostiories.indices {
+                DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * 0.1) {
+                    shownCards[index] = true
+                }
+            }
+        }
     }
 }
 
