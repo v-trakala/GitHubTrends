@@ -11,7 +11,7 @@ import SwiftUI
 struct GitHubTrendsApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            GitHubTrendListView(viewModel: GitHubTrendListViewModel())
         }
     }
 }
